@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     fname = "municipales_2014_rennes_tour1_1.csv"
     outfilename = "bureaux_decoupage.json"
-    outfilename = "bureauxG1.json"
+    #outfilename = "resultatsG1.json"
     offices = {}
     with open(fname, 'r') as csv_file:
 
@@ -26,19 +26,20 @@ if __name__ == '__main__':
 
         for row in reader:
             newrow = []
-            #if(row["NIVEAU_DETAIL"] == "bu"):
-            if(row["NIVEAU_DETAIL"] == "vi"):
+            if(row["NIVEAU_DETAIL"] == "bu"):
+            #if(row["NIVEAU_DETAIL"] == "vi"):
                 # Get results for each political list
-                for i in range(1, 8):
+                for i in range(1, 10):
+                    #print("%s -> %s" % ("CANDIDAT_%s" % (i), row["CANDIDAT_%s" % (i)]))
                     nom_candidat = unicode(row["CANDIDAT_%s" % (i)].decode("utf8"))
                     #normalize name
                     normalized_nom = unicodedata.normalize('NFKD', nom_candidat).encode('ascii', 'ignore').lower().replace(" ", "_")
                     newrow.append({normalized_nom: float(row["POURCENTAGE_%s" % i].replace(",", "."))})
 
                 results = sorted(newrow, key=lambda k: k.values()[0], reverse=True)
-                #offices[row["NUMERO_LIEU"]] = results
-                offices = results
-                break
+                offices[row["NUMERO_LIEU"]] = results
+                #offices = results
+                #break
 
     with open(outfilename, 'w') as outfile:
         response_json = json.dump(offices, outfile)
