@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Élections municipales 2014 à Toulouse</title>
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
+  <link href='http://fonts.googleapis.com/css?family=Cabin' rel='stylesheet' type='text/css'>
+
+  <style>
+
+    html, body {
+      height:100%;
+      font-family: 'Cabin', sans-serif;
+      margin:0;
+    }
+
+    body {
+      width: 98%;
+      padding-left:1%;
+    }
+
+    h1 {
+      margin:0;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    #map {
+      width: 100%;
+      height: 80%;
+    }
+
+    #logo {
+      float: right;
+      padding-top: 5px;
+      padding-bottom: 5px;
+      width: 200px;
+    }
+
+    #title2 {
+      margin: 0;
+    }
+
+    #footer {
+      padding-top: 5px;
+      padding-bottom: 5px;
+      font-size: 1.2em;
+    }
+
+    .info {
+      padding: 6px 8px;
+      font-family: 'Cabin', sans-serif;
+      background: white;
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      min-width: 390px;
+    }
+
+    .legend {
+      text-align: left;
+      line-height: 18px;
+      color: #555;
+    }
+
+    .legend ul {
+      padding-left: 0px;
+    }
+
+    .legend li {
+      list-style-type: none;
+    }
+
+    .leaflet-bar a.leaflet-control-touchhover-toggled {
+      background: #888;
+    }
+
+    @media screen and (max-width: 1080px) {
+      #title2 {
+        font-size: 1em;
+      }
+    }
+
+    @media screen and (max-width: 980px) {
+      #title {
+        font-size: 1.5em;
+      }
+      #title2 {
+        font-size: 0.8em;
+      }
+      #logo {
+        width: 150px;
+      }
+      #footer {
+        font-size: 0.8em;
+      }
+      .parti {
+        display: none;
+      }
+      .info {
+        min-width: 250px;
+      }
+    }
+
+    @media screen and (max-width: 780px) {
+      #title {
+        font-size: 1.4em;
+      }
+      #title2 {
+        font-size: 0.7em;
+      }
+      #footer {
+        display: none;
+      }
+      #map {
+        height: 83%;
+      }
+    }
+
+    @media screen and (max-width: 680px) {
+      #title {
+        font-size: 1.2em;
+      }
+      .info {
+        font-size: 0.8em;
+        min-width: 0px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <a href="http://www.makina-corpus.com" target="_blank"><img id="logo" src="http://depot.makina-corpus.org/public/logo.gif"></a>
+    <h1 id="title">Élections municipales 2014 à Rennes - Premier tour</h1>
+    <h3 id="title2">Résultats par bureau de vote - la couleur affichée est celle du candidat arrivé en tête.</h3>
+  </div>
+  <div id="map"></div>
+  <div id="footer">
+    N'hésitez pas à nous contacter pour votre ville ou pour d'autres projets : <a href="mailto:sig@makina-corpus.com">sig@makina-corpus.com</a>
+  </div>
+
+  <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+<!--   <script type="text/javascript" src="http://d3js.org/d3.v2.js"></script> -->
+  <script type="text/javascript" src="Control.TouchHover.js"></script>
+  <script type="text/javascript" src="bureaux.geojson"></script>
+  <script type="text/javascript" src="bureaux_decoupage.json"></script>
+  <script type="text/javascript" src="resultatsG1.json"></script>
+  <script type="text/javascript">
+
+    var osmAttrib='Par <a href="http://www.makina-corpus.com" target="_blank">Makina Corpus</a> | <a href="https://github.com/makinacorpus/toulouse2014/tree/gh-pages" target="_blank">Code</a>';
+
+    var map = L.map('map', {maxZoom: 17, minZoom: 11}).setView([48.114767, -1.674929], 13);
+    // Don't show the 'Powered by Leaflet' text 
+    map.attributionControl.setPrefix(osmAttrib);
+    map.setMaxBounds(new L.LatLngBounds(new L.LatLng(48.067756, -1.852042),new L.LatLng(48.160054, -1.404929)));
+
+    L.tileLayer("http://{s}.livembtiles.makina-corpus.net/makina/osmlight-france/{z}/{x}/{y}.png",{attribution:'&copy; Contributeurs <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a>'}).addTo(map)
+
+    if (L.Browser.touch) {
+      L.control.touchHover().addTo(map);
+    }
+
+    // get color depending on the candidate
+
+    var colors = {'caroline_ollivro': '#B6A3C9', 'pierre_priet': '#C40000', 'nathalie_appere': '#e20040', 'gerard_de_mellon': '#1B2638', 'matthieu_theurier': '#7AB41D', 'valerie_hamon': '#4D6BA2', 'alexandre_noury': '#EEA2B0'};
+    
+    var fullNames = { 'gerard_de_mellon': 'Gerard DE MELLON', 'nathalie_appere': 'Nathalie APPÉRÉ', 'matthieu_theurier': 'Matthieu THEURIER', 'valerie_hamon': 'Valérie HAMON', 'caroline_ollivro': 'Caroline OLLIVRO', 'pierre_priet': 'Pierre PRIET', 'alexandre_noury': 'Alexandre NOURY'}
+
+    var partis = {'matthieu_theurier': 'EELV/FG', 'nathalie_appere': 'PS', 'gerard_de_mellon': 'FN', 'pierre_priet': 'POI', 'caroline_ollivro': 'RBE', 'valerie_hamon': 'LO', 'alexandre_noury': 'S&P'};
+
+    function getColor(candidat, score1, score2) {
+      if (score1 == score2) {
+        return 'white';
+      } else{
+        return colors[candidat];
+      };
+    }
+
+    function bureauxStyle(feature) {
+      var data = results[feature.properties.NUM_BUREAU];
+      var candidat0 = Object.keys(data[0])[0];
+      var candidat1 = Object.keys(data[1])[0];
+      return {
+        color: "lightgrey",
+        weight: 1,
+        opacity: 1,
+        fillColor: getColor(
+           candidat0, 
+           data[0][candidat0], 
+           data[1][candidat1]),
+        fillOpacity: 0.6
+      };
+    }
+
+    function highlightFeature(e) {
+      var layer = e.target;
+      legend.update(layer.feature.properties);
+      layer.setStyle({
+        weight: 4,
+      });
+    }
+
+    var geojson;
+
+    function resetHighlight(e) {
+      geojson.setStyle(bureauxStyle);
+      legend.update();
+    }
+
+    function onEachFeature(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+      });
+    }
+
+    geojson = L.geoJson(bureaux, {
+      style: bureauxStyle,
+      onEachFeature: onEachFeature
+    }).addTo(map);
+
+    var legend = L.control({position: 'topright'});
+
+    legend.onAdd = function (map) {
+      this._div = L.DomUtil.create('div', 'legend info');
+      this.update();
+      return this._div;
+    };
+
+    function generateRowHtml(value) {
+      var id = Object.keys(value)
+      var row = '<li><canvas id="myCanvas" width="';
+      row += value[id]*2;
+      row += '" height="20" style="border:1px solid ' + colors[id] + '; background-color:';
+      row += colors[id];
+      row += '; opacity: 0.6;"></canvas> ';
+      row += fullNames[id];
+      row += '<span class="parti"> (' + partis[id] + ')</span> : ';
+      row += value[id];
+      row += '%</li>';
+      return row;
+    }
+
+    legend.update = function (bureau) {
+      
+      var data = (bureau) ? results[bureau.NUM_BUREAU] : resultsG1;
+      var resultsList = '<ul>';
+      for(var key in data) {
+        resultsList += generateRowHtml(data[key]);
+      };
+      resultsList += '</u>';
+      this._div.innerHTML = (bureau) ? ['<b>', bureau.NOM_CENTRE, '</b> (n°', bureau.NUM_BUREAU, ')<br />', resultsList].join("") : '<h3>Résultats à Rennes</h3>' + 'Survolez un bureau de vote pour plus de détails' + resultsList;
+    };
+
+    legend.addTo(map);
+
+  </script>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-49309002-1', 'makinacorpus.github.io');
+    ga('send', 'pageview');
+  
+  </script>
+</body>
+</html>
