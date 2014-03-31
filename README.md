@@ -10,6 +10,8 @@ rennes2014
 ## Crédits
 
 ### Données
+Open Data de la ville de Rennes :  
+[![Open Data Rennes] (http://www.data.rennes-metropole.fr/fileadmin/templates/api/images/logo.jpg)](http://www.data.rennes-metropole.fr/les-donnees/catalogue/?tx_icsopendatastore_pi1[uid]=261)
 
 ### Code
 
