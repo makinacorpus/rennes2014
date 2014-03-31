@@ -28,9 +28,6 @@
       padding-bottom: 10px;
     }
 
-    h3 {
-      display: inline;
-    }
     #map {
       width: 100%;
       height: 80%;
@@ -74,6 +71,10 @@
 
     .legend li {
       list-style-type: none;
+    }
+    
+    h3{
+      display: inline;
     }
 
     .leaflet-bar a.leaflet-control-touchhover-toggled {
@@ -138,7 +139,7 @@
     <a href="http://www.makina-corpus.com" target="_blank"><img id="logo" src="http://depot.makina-corpus.org/public/logo.gif"></a>
     <h1 id="title">Élections municipales 2014 à Rennes - Premier tour</h1>
     <h3 id="title2">Résultats par bureau de vote - la couleur affichée est celle du candidat arrivé en tête.</h3>
-    <a href="by-candidate.html">Carte par candidat</a> <a href="second-tour.html">Carte du deuxième tour</a>
+    <a href="by-candidate-second-tour.html">Carte par candidat</a> <a href="index.html">Carte du premier tour</a>
   </div>
   <div id="map"></div>
   <div id="footer">
@@ -149,11 +150,11 @@
 <!--   <script type="text/javascript" src="http://d3js.org/d3.v2.js"></script> -->
   <script type="text/javascript" src="Control.TouchHover.js"></script>
   <script type="text/javascript" src="bureaux.geojson"></script>
-  <script type="text/javascript" src="bureaux_decoupage.json"></script>
-  <script type="text/javascript" src="resultatsG1.json"></script>
+  <script type="text/javascript" src="bureaux_decoupage_2.json"></script>
+  <script type="text/javascript" src="resultatsG2.json"></script>
   <script type="text/javascript">
 
-    var osmAttrib='Par <a href="http://www.makina-corpus.com" target="_blank">Makina Corpus</a> | <a href="https://github.com/makinacorpus/rennes2014/tree/gh-pages" target="_blank">Code</a> | <a href="http://www.data.rennes-metropole.fr/les-donnees/catalogue/?tx_icsopendatastore_pi1[uid]=261" target="_blank">Données</a> | Découpage';
+    var osmAttrib='Par <a href="http://www.makina-corpus.com" target="_blank">Makina Corpus</a> | <a href="https://github.com/makinacorpus/rennes2014/tree/gh-pages" target="_blank">Code</a>';
 
     var map = L.map('map', {maxZoom: 17, minZoom: 11}).setView([48.114767, -1.674929], 13);
     // Don't show the 'Powered by Leaflet' text 
@@ -183,7 +184,7 @@
     }
 
     function bureauxStyle(feature) {
-      var data = results[feature.properties.NUM_BUREAU];
+      var data = results2[feature.properties.NUM_BUREAU];
       var candidat0 = Object.keys(data[0])[0];
       var candidat1 = Object.keys(data[1])[0];
       return {
@@ -249,13 +250,13 @@
 
     legend.update = function (bureau) {
       
-      var data = (bureau) ? results[bureau.NUM_BUREAU] : resultsG1;
+      var data = (bureau) ? results2[bureau.NUM_BUREAU] : resultsG2;
       var resultsList = '<ul>';
       for(var key in data) {
         resultsList += generateRowHtml(data[key]);
       };
       resultsList += '</u>';
-      this._div.innerHTML = (bureau) ? ['<b>', bureau.NOM_CENTRE, '</b> (n°', bureau.NUM_BUREAU, ')<br />', resultsList].join("") : '<h3>Résultats à Rennes 1er tour</h3></br>' + 'Survolez un bureau de vote pour plus de détails' + resultsList;
+      this._div.innerHTML = (bureau) ? ['<b>', bureau.NOM_CENTRE, '</b> (n°', bureau.NUM_BUREAU, ')<br />', resultsList].join("") : '<h3>Résultats à Rennes 2e tour</h3></br>' + 'Survolez un bureau de vote pour plus de détails' + resultsList;
     };
 
     legend.addTo(map);
