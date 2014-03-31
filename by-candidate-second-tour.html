@@ -235,8 +235,6 @@
 
       
       function getColor(candidat, rate) {
-        console.log(candidat);
-        console.log(colors[candidat]);
         scale = chroma.scale(['white', chroma(colors[candidat]).saturate(50)]);
         var color = scale(rate).darken(rate*20).hex();
 
@@ -250,7 +248,6 @@
       function bureauxStyle(feature) {
         var candidat = Object.keys(resultat_candidat[feature.properties.NUM_BUREAU][0])[0];
         var rate = resultat_candidat[feature.properties.NUM_BUREAU][0][candidat]/scores[candidat]["max"]
-        console.log(rate);
         return {
           color: "black",
           weight: 0.5,
