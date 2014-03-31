@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Élections municipales 2014 à Rennes</title>
+  <title>Élections municipales 2014 à Rennes - Second tour</title>
   <meta charset="utf-8" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -142,7 +142,7 @@
 <body>
   <div id="header">
     <a href="http://www.makina-corpus.com" target="_blank"><img id="logo" src="http://depot.makina-corpus.org/public/logo.gif"></a>
-    <h1 id="title">Élections municipales 2014 à Rennes - Premier tour</h1>
+    <h1 id="title">Élections municipales 2014 à Rennes - Second tour</h1>
     <h3 id="title2">Résultats par bureau de vote - la nuance dépend du pourcentage de votes.</h3>
     <select id="select-candidate"></select> 
     <a href="second-tour.html">Carte complète</a> <a href="index.html">Carte du premier tour</a>
@@ -161,7 +161,7 @@
   <script type="text/javascript" src="resultatsG2.json"></script>
   <script type="text/javascript">
 
-    var colors = {'caroline_ollivro': '#B6A3C9', 'pierre_priet': '#C40000', 'nathalie_appere': '#e20040', 'gerard_de_mellon': '#1B2638', 'matthieu_theurier': '#7AB41D', 'valerie_hamon': '#4D6BA2', 'alexandre_noury': '#EEA2B0', 'bruno_chavanat': '#FB7102', 'remy_lescure': '#CCCCCC'};
+    var colors = {'caroline_ollivro': '#B6A3C9', 'pierre_priet': '#C40000', 'nathalie_appere': '#e20040', 'gerard_de_mellon': '#1B2638', 'matthieu_theurier': '#7AB41D', 'valerie_hamon': 'red', 'alexandre_noury': '#EEA2B0', 'bruno_chavanat': '#4D6BA2', 'remy_lescure': '#CCCCCC'};
     
     var fullNames = { 'gerard_de_mellon': 'Gerard DE MELLON', 'nathalie_appere': 'Nathalie APPÉRÉ', 'matthieu_theurier': 'Matthieu THEURIER', 'valerie_hamon': 'Valérie HAMON', 'caroline_ollivro': 'Caroline OLLIVRO', 'pierre_priet': 'Pierre PRIET', 'alexandre_noury': 'Alexandre NOURY', 'remy_lescure': 'Rémy LESCURE', 'bruno_chavanat': 'Bruno CHAVANAT'};
 
@@ -213,9 +213,6 @@
       }
       update_data(current_candidat);
       
-
-      
-
       var x = document.getElementById("select-candidate");
       for (var i = 0; i < resultsG2.length; i++) {
         for (key in resultsG2[i]) {
@@ -236,11 +233,13 @@
         legend.update();
       });
 
-      var colors = {"chaynes": "#9D0000", "domergue": "#4D6BA2", "salse": "#9D0000", "ressiguier": "#FF0000", "saurel": "#EEA2B0", "jamet": "#1B2638", "francis": "#8297BE", "balenghien": "#EEA2B0", "moure": "#e20040", "nuls": "black"};
       
       function getColor(candidat, rate) {
+        console.log(candidat);
+        console.log(colors[candidat]);
         scale = chroma.scale(['white', chroma(colors[candidat]).saturate(50)]);
         var color = scale(rate).darken(rate*20).hex();
+
         return color;
       }
 
@@ -251,6 +250,7 @@
       function bureauxStyle(feature) {
         var candidat = Object.keys(resultat_candidat[feature.properties.NUM_BUREAU][0])[0];
         var rate = resultat_candidat[feature.properties.NUM_BUREAU][0][candidat]/scores[candidat]["max"]
+        console.log(rate);
         return {
           color: "black",
           weight: 0.5,
